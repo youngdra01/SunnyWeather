@@ -1,6 +1,7 @@
 package com.sunnyweather.android.ui.place
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import androidx.fragment.app.Fragment
@@ -8,11 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sunnyweather.android.databinding.FragmentPlaceBinding
+import com.sunnyweather.android.ui.weather.WeatherActivity
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,7 +28,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class PlaceFragment : Fragment() {
-    private val viewModel by lazy {
+    val viewModel by lazy {
         ViewModelProvider(this)[PlaceViewModel::class.java]
     }
 
@@ -48,6 +51,18 @@ class PlaceFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        if (viewModel.isPlaceSaved()){
+            val place = viewModel.getSavedPlace()
+            val intent = Intent(context, WeatherActivity::class.java).apply {
+                putExtra("location_lng", place.location.lng)
+                putExtra("location_lat", place.location.lat)
+                putExtra("place_name", place.name)
+            }
+            startActivity(intent)
+            activity?.finish()
+            return
+        }
+
         val layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.layoutManager =  layoutManager
         adapter = PlaceAdapter(this, viewModel.placeList)

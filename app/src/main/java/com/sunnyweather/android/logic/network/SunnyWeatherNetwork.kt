@@ -1,8 +1,10 @@
 package com.sunnyweather.android.logic.network
 
+import com.sunnyweather.android.logic.model.Weather
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.ServiceConfigurationError
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -27,4 +29,12 @@ object SunnyWeatherNetwork {
             })
         }
     }
+
+    private val weatherService = ServiceCreator.create(WeatherService::class.java)
+
+    suspend fun getDailyWeather(lng:String, lat:String) =
+        weatherService.getDailyWeather(lng, lat).await()
+
+    suspend fun getRealtimeWeather(lng:String, lat:String) =
+        weatherService.getRealtimeWeather(lng, lat).await()
 }
